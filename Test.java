@@ -140,7 +140,7 @@ public class Test {
             }
 
 
-            if(this.isletter(this.char_now)){                                                   //字母
+            if(this.isletter(this.char_now)||this.is_(this.char_now)){                                                   //字母
                 if(!this.getchar()){
                     this.printToken(0);
                     return;
