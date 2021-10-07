@@ -5,8 +5,6 @@ public class Test {
     char char_last;
     String token_now;
     String line_now;
-    int num_now;
-    int symbol;
     int len;
     int i = 0;
 
@@ -21,7 +19,6 @@ public class Test {
     }
     void retract(){
         if(!this.token_now.isEmpty()) {
-//            this.token_now = this.token_now.substring(0, this.token_now.length() - 1);
             this.char_now = this.char_last;
             this.i--;
         }
@@ -188,22 +185,40 @@ public class Test {
                     this.printToken(8);
                 }
             }
-
-            else if(this.isSemi(this.char_now)){this.printToken(9);}                              // ;
-            else if(this.isLpar(this.char_now)){this.printToken(10);}                             // (
-            else if(this.isRpar(this.char_now)){this.printToken(11);}                             // )
-            else if(this.isLBrace(this.char_now)){this.printToken(12);}                           // {
-            else if(this.isRBrace(this.char_now)){this.printToken(13);}                           // }
-            else if(this.isPlus(this.char_now)){this.printToken(14);}                             // +
-            else if(this.isStar(this.char_now)){this.printToken(15);}                             // *
-            else if(this.isDivi(this.char_now)){this.printToken(16);}                             // /
-            else if(this.isLt(this.char_now)){this.printToken(17);}                               // <
-            else if(this.isRt(this.char_now)){this.printToken(18);}                               // >
-
-
-            else {
-                System.out.println("Err");
-                System.exit(0);
+            else switch (this.char_now){
+                    case ';':
+                        this.printToken(9);
+                        break;
+                    case '(':
+                        this.printToken(10);
+                        break;
+                    case ')':
+                        this.printToken(11);
+                        break;
+                    case '{':
+                        this.printToken(12);
+                        break;
+                    case '}':
+                        this.printToken(13);
+                        break;
+                    case '+':
+                        this.printToken(14);
+                        break;
+                    case '*':
+                        this.printToken(15);
+                        break;
+                    case '/':
+                        this.printToken(16);
+                        break;
+                    case '<':
+                        this.printToken(17);
+                        break;
+                    case '>':
+                        this.printToken(18);
+                        break;
+                    default:
+                        System.out.println("Err");
+                        System.exit(0);
             }
         }
     }
@@ -231,7 +246,6 @@ public class Test {
             test.line_now = sc.nextLine();
             test.getToken();
         }
-
         sc.close();
     }
 }
