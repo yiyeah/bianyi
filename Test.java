@@ -11,7 +11,7 @@ public class Test {
     int i = 0;
 
     static String   output[] = {"Ident","Number","If","Else","While","Break","Continue","Return","Assign","Semicolon",
-            "LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Rt","Eq"};
+            "LPar","RPar","LBrace","RBrace","Plus","Mult","Div","Lt","Gt","Eq"};
 
     void clearToken(){
         this.token_now = "";
