@@ -227,7 +227,7 @@ public class Test {
 	// write your code here
         Scanner sc = new Scanner(System.in);
         Test test = new Test();
-        while(sc.hasNextLine()){
+        while(sc.hasNext()){
             test.line_now = sc.nextLine();
             test.getToken();
         }
