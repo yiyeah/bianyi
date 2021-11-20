@@ -1,75 +1,54 @@
-class Visitor extends lab1BaseVisitor<Void>{
-    Parseredix parseredix = new Parseredix();
+// Generated from lab1.g4 by ANTLR 4.9.2
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
-    @Override
-    public Void visitCompUnit(lab1Parser.CompUnitContext ctx) {
-        return super.visitCompUnit(ctx);
-    }
-
-    @Override
-    public Void visitFuncDef(lab1Parser.FuncDefContext ctx) {
-        System.out.print("define dso_local ");
-        visit(ctx.funcType());
-        visit(ctx.ident());
-        System.out.print("() ");
-        visit(ctx.block());
-        return null;
-    }
-
-    @Override
-    public Void visitFuncType(lab1Parser.FuncTypeContext ctx) {
-        System.out.print("i32 ");
-        return null;
-    }
-
-    @Override
-    public Void visitIdent(lab1Parser.IdentContext ctx) {
-        System.out.print("@main ");
-        return null;
-    }
-
-    @Override
-    public Void visitBlock(lab1Parser.BlockContext ctx) {
-        System.out.print("{ \n");
-        visit(ctx.stmt());
-        System.out.print("}");
-        return null;
-    }
-
-    @Override
-    public Void visitStmt(lab1Parser.StmtContext ctx) {
-        System.out.print("ret ");
-        visit(ctx.number());
-        System.out.print("\n");
-        return null;
-    }
-
-    @Override
-    public Void visitNumber(lab1Parser.NumberContext ctx) {
-        String num="";
-        if(ctx.Decimal_const()!=null){
-            num = ctx.Decimal_const().getText();
-        }
-        else if(ctx.Hexadecimal_const()!=null){
-            num = parseredix.parseHex(ctx.Hexadecimal_const().getText());
-        }
-        else if(ctx.Octal_const()!=null){
-            num = parseredix.parseOct(ctx.Octal_const().getText());
-        }
-        System.out.print("i32 "+num);
-        return null;
-    }
-}
-
-class Parseredix{
-    Parseredix(){
-    }
-    public String parseHex(String input){
-        return ""+Integer.parseInt(input.substring(2),16);
-    }
-    public String parseOct(String input){
-        if(input.equals("0"))
-            return "0";
-        return ""+Integer.parseInt(input.substring(1),8);
-    }
+/**
+ * This interface defines a complete generic visitor for a parse tree produced
+ * by {@link lab1Parser}.
+ *
+ * @param <T> The return type of the visit operation. Use {@link Void} for
+ * operations with no return type.
+ */
+public interface lab1Visitor<T> extends ParseTreeVisitor<T> {
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#compUnit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCompUnit(lab1Parser.CompUnitContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#funcDef}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncDef(lab1Parser.FuncDefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#funcType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncType(lab1Parser.FuncTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#ident}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdent(lab1Parser.IdentContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#block}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBlock(lab1Parser.BlockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#stmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStmt(lab1Parser.StmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link lab1Parser#number}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumber(lab1Parser.NumberContext ctx);
 }
