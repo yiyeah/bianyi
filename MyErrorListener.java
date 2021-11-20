@@ -19,7 +19,7 @@ public class MyErrorListener extends BaseErrorListener {
         if (!sourceName.isEmpty()) {
             sourceName = String.format("%s:%d:%d: ", sourceName, line, charPositionInLine);
         }
-
+        //System.out.println(sourceName);
         System.exit(1);
     }
 }

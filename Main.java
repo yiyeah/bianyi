@@ -28,18 +28,19 @@ public class Main {
 
             CharStream inputStream = CharStreams.fromString(input); // 获取输入流
             lab1Lexer lexer = new lab1Lexer(inputStream);
-            lexer.removeErrorListeners();
-            lexer.addErrorListener(MyErrorListener.INSTANCE);
+            //lexer.removeErrorListeners();
+            //lexer.addErrorListener(MyErrorListener.INSTANCE);
             
             CommonTokenStream tokenStream = new CommonTokenStream(lexer); // 词法分析获取 token 流
             lab1Parser parser = new lab1Parser(tokenStream);
-            parser.removeErrorListeners();
-            parser.addErrorListener(MyErrorListener.INSTANCE);                  
+            //parser.removeErrorListeners();
+            //parser.addErrorListener(MyErrorListener.INSTANCE);                  
             ParseTree tree = parser.compUnit(); // 获取语法树的根节点
-
+            System.out.println(tree.toStringTree(parser));
+            
             Visitor visitor = new Visitor();
             visitor.visit(tree);
-
+            
         // File outfile = new File("out.txt");
         // try {
         //     PrintWriter output = new PrintWriter(outfile);
