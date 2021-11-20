@@ -1,4 +1,6 @@
 class Visitor extends lab1BaseVisitor<Void>{
+    Parseredix parseredix = new Parseredix();
+
     @Override
     public Void visitCompUnit(lab1Parser.CompUnitContext ctx) {
         return super.visitCompUnit(ctx);
@@ -49,12 +51,25 @@ class Visitor extends lab1BaseVisitor<Void>{
             num = ctx.Decimal_const().getText();
         }
         else if(ctx.Hexadecimal_const()!=null){
-            num = ctx.Hexadecimal_const().getText();
+            num = parseredix.parseHex(ctx.Hexadecimal_const().getText());
         }
         else if(ctx.Octal_const()!=null){
-            num = ctx.Octal_const().getText();
+            num = parseredix.parseOct(ctx.Octal_const().getText());
         }
         System.out.print("i32 "+num);
         return null;
+    }
+}
+
+class Parseredix{
+    Parseredix(){
+    }
+    public String parseHex(String input){
+        return ""+Integer.parseInt(input.substring(2),16);
+    }
+    public String parseOct(String input){
+        if(input.equals("0"))
+            return "0";
+        return ""+Integer.parseInt(input.substring(1),8);
     }
 }
