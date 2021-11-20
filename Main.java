@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         Prepare p =new Prepare();
         String input = "" ;
-        File infile = new File("args[0]");
+        File infile = new File(args[0]);
         try{
             Scanner sc = new Scanner(infile);
             while(sc.hasNextLine()){
