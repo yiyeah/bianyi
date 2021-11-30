@@ -1,4 +1,4 @@
-FROM openjdk:12
+FROM openjdk:15
 WORKDIR /app/
-COPY Test.java ./
-RUN javac Test.java
+COPY test1.java ./
+RUN javac test1.java
