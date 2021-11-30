@@ -6,6 +6,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static Parseredix parseredix = new Parseredix();
     static String nodenumber = "0";
     static int counter = 0;
+    static int calc_value;
     static List <function> funcTable = new ArrayList<>();
     static List <varTableItem> varTable = new ArrayList<>();
 
@@ -77,7 +78,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     break;
                 }
                 else if(findTableByAddr(nodenumber)!=null){     //变量表中能找到
-                    System.out.println("%"+ ++counter +" = load i32,i32 *"+nodenumber);
+                    System.out.println("%"+ ++counter +" = load i32, i32* "+nodenumber);
                 }
                 System.out.println("ret i32 %"+counter);
                 break;
@@ -126,9 +127,12 @@ class Visitor extends lab1BaseVisitor<Void>{
             System.out.println("var defined repeatedly error");
             System.exit(1);
         }
-
-        varTableItem tableItem = new varTableItem(ConstName, nodenumber, "const", nodenumber);
-        varTable.add(tableItem);   
+        varTableItem tableItem;
+        if(nodenumber.charAt(0)!='%')
+            tableItem = new varTableItem(ConstName, nodenumber, "const", nodenumber);
+        else
+            tableItem = new varTableItem(ConstName, ""+calc_value, "const", ""+calc_value);
+        varTable.add(tableItem); 
         return null;
     }
 
@@ -193,6 +197,9 @@ class Visitor extends lab1BaseVisitor<Void>{
         varTableItem tmp = findTableByName(Lval);
         if(tmp!=null){
             nodenumber = tmp.address;
+            if(tmp.value!=null&&tmp.value.charAt(0)!='%'){
+                calc_value =Integer.parseInt(tmp.value);
+            }
         }
         else{
             System.out.println("lval not find error");
@@ -212,17 +219,21 @@ class Visitor extends lab1BaseVisitor<Void>{
             case 3:{
                 visit(ctx.addExp());
                 String tmp1 =nodenumber;
+                int v1 = calc_value;
 
                 visit(ctx.mulExp());
                 String tmp2 =nodenumber;
+                int v2 = calc_value;
 
                 if(ctx.Plus()!=null){
                     System.out.println("%" + (++counter) + " = add i32 " + tmp1 +", "+ tmp2);
                     nodenumber ="%"+counter;
+                    calc_value = v1+v2;
                 }
                 else if(ctx.Sub()!=null){
                     System.out.println("%" + (++counter) + " = sub i32 " + tmp1 +", "+ tmp2);
                     nodenumber ="%"+counter;
+                    calc_value = v1-v2;
                 }
                 break;
             }
@@ -241,22 +252,26 @@ class Visitor extends lab1BaseVisitor<Void>{
             case 3:{
                 visit(ctx.mulExp());
                 String tmp1 = nodenumber;
+                int v1 = calc_value;
 
                 visit(ctx.unaryExp());
                 String tmp2 = nodenumber;
-
+                int v2 = calc_value;
 
                 if(ctx.Mul()!=null){
                     System.out.println("%" + (++counter) + " = mul i32 " + tmp1 +", "+ tmp2);
                     nodenumber ="%"+counter;
+                    calc_value = v1*v2;
                 }
                 else if(ctx.Div()!=null){
                     System.out.println("%" + (++counter) + " = sdiv i32 " + tmp1 +", "+ tmp2);
                     nodenumber ="%"+counter;
+                    calc_value = v1/v2;
                 }
                 else if(ctx.Mod()!=null){
                     System.out.println("%" + (++counter) + " = srem i32 " + tmp1 +", "+ tmp2);
                     nodenumber ="%"+counter;
+                    calc_value =v1%v2;
                 }
                 
             }
@@ -304,7 +319,6 @@ class Visitor extends lab1BaseVisitor<Void>{
 
     @Override
     public Void visitPrimaryExp(lab1Parser.PrimaryExpContext ctx) {
-        // TODO Auto-generated method stub
         switch(ctx.children.size()){
             case 1:{
                 if(ctx.lVal()!=null){
@@ -348,6 +362,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     public Void visitNumber(lab1Parser.NumberContext ctx) {  
         // System.out.print("i32 "+num);
         nodenumber = getNumber(ctx);
+        calc_value = Integer.parseInt(getNumber(ctx));
         return null;
     }
 
