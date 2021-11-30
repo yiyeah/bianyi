@@ -20,6 +20,7 @@ public class Main {
             Scanner sc = new Scanner(infile);
             while(sc.hasNextLine()){
                 input +=p.clearnote(sc.nextLine());
+                System.out.println(input);
             }
             sc.close();
         }catch(FileNotFoundException e){
