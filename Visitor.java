@@ -200,6 +200,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 String dest = ++counter+":";
                 if(curBlock.jmpTrueBlock.jmpTrueBlock==null && need_br(curBlock.jmpTrueBlock))
                     curBlock.jmpTrueBlock.saveBuf("br label %"+counter,true);
+                if(curBlock.jmpTrueBlock.destBlock!=null && need_br(curBlock.jmpTrueBlock.destBlock))
+                    curBlock.jmpTrueBlock.destBlock.saveBuf("br label %"+counter,true);
                 if(curBlock.jumFalseBlock.jmpTrueBlock==null && need_br(curBlock.jumFalseBlock))
                     curBlock.jumFalseBlock.saveBuf("br label %"+counter,true);
 
