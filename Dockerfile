@@ -1,4 +1,5 @@
-FROM openjdk:12
+FROM openjdk:15
+COPY ./* /app/
 WORKDIR /app/
-COPY Test.java ./
-RUN javac Test.java
+ENV CLASSPATH=".:./antlr-4.9.2-complete.jar:$CLASSPATH"
+RUN javac Main.java

@@ -1,7 +1,8 @@
-[jobs.lexer]
+[jobs.lab5]
 
-image = { source = "dockerfile", path = ".", tag = "test-submit" }
+image = { source = "dockerfile", path = ".", tag = "lab1_test" }
 
 run = [
-  "java Test < $input",
+    "java -cp .:./antlr-4.9.2-complete.jar Main $input >$ir" ,
+    "cat $input"
 ]
