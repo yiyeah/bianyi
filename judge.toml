@@ -3,6 +3,6 @@
 image = { source = "dockerfile", path = ".", tag = "lab1_test" }
 
 run = [
-    "java -cp .:./antlr-4.9.2-complete.jar Main $input >$ir" ,
     "cat $input"
+    "java -cp .:./antlr-4.9.2-complete.jar Main $input >$ir" ,
 ]
