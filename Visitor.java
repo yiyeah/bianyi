@@ -339,7 +339,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                     System.out.println("@"+varName+"= dso_local global i32 "+calc_value);
                     varTableItem tableItem = new varTableItem(varName, ""+calc_value, "var", "@"+varName);
                     globalvarTable.add(tableItem); 
-      
             }
             else{
                 System.out.println("@"+varName+"= dso_local global i32 "+"0");
@@ -906,6 +905,11 @@ class blockTreeNode{
                     return tmp;
             }
             block = block.parBlock;
+
+            for(varTableItem tmp :globalvarTable){
+                if(tmp.address.equals(addr))
+                    return tmp;      
+            }
         }
 
         return null;
