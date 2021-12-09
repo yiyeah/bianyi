@@ -35,6 +35,7 @@ class Visitor extends lab1BaseVisitor<Void>{
        blockTreeNode.globalvarTable = globalvarTable;
        global = false;
        visit(ctx.funcDef());
+       //System.out.println(blockTree.size());
         return null;
     }
 
@@ -64,14 +65,14 @@ class Visitor extends lab1BaseVisitor<Void>{
             curBlock.saveBuf("}",false);
         }
         else if(ctx.getParent().getParent().children.size() == 5 || ctx.getParent().getParent().children.size() == 7){
-            //'if' '(' cond ')' stmt ('else' stmt)? 
+            //'if' '(' cond ')' stmt ('else' stmt)?  
+            //While ( cond ) stmt
             for(lab1Parser.BlockItemContext blockitem: ctx.blockItem()){
                 visit(blockitem);
             }
         }
         else{
-            //create new block
-            
+            //create new block     
             blockTreeNode save_curblock = curBlock;
             blockTreeNode tmp = new blockTreeNode(counter, curBlock);
             curBlock.otherBlocks.add(tmp);
@@ -154,35 +155,66 @@ class Visitor extends lab1BaseVisitor<Void>{
                 break;
             } 
             case 5:{
-                // 'if' '(' cond ')' stmt
-                visit(ctx.cond());
+                // If '(' cond ')' stmt
+                if(ctx.If()!=null){         
+                    visit(ctx.cond());
 
-                blockTreeNode save_curnode = curBlock;
+                    blockTreeNode save_curnode = curBlock;
 
-                String iftrue = ++counter+":";
-                curBlock.saveBuf("br i1 "+nodenumber+",label %"+ counter+", label ", false);
+                    String iftrue = ++counter+":";
+                    curBlock.saveBuf("br i1 "+nodenumber+",label %"+ counter+", label ", false);
 
-                blockTreeNode truenode = new blockTreeNode(counter, curBlock);
-                blockTree.add(truenode);
-                curBlock.jmpTrueBlock = truenode;
-                curBlock = truenode;
-                curBlock.saveBuf(iftrue, true);
+                    blockTreeNode truenode = new blockTreeNode(counter, curBlock);
+                    blockTree.add(truenode);
+                    curBlock.jmpTrueBlock = truenode;
+                    curBlock = truenode;
+                    curBlock.saveBuf(iftrue, true);
 
-                lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
-                visit(tmp);
-                if(need_br(curBlock))
-                    curBlock.saveBuf("br label %"+ ++counter,true);
-                curBlock = save_curnode;
-                 
-                String dest = counter+":";
-                curBlock.saveBuf("%"+counter, true);
+                    lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
+                    visit(tmp);
+                    if(need_br(curBlock))
+                        curBlock.saveBuf("br label %"+ ++counter,true);
+                    curBlock = save_curnode;
+                    
+                    String dest = counter+":";
+                    curBlock.saveBuf("%"+counter, true);
 
-                blockTreeNode destnode = new blockTreeNode(counter, curBlock);
-                blockTree.add(destnode);
-                curBlock.destBlock= destnode;
-                curBlock = destnode;
-                curBlock.saveBuf(dest, true);
+                    blockTreeNode destnode = new blockTreeNode(counter, curBlock);
+                    blockTree.add(destnode);
+                    curBlock.destBlock= destnode;
+                    curBlock = destnode;
+                    curBlock.saveBuf(dest, true);
+                }
+                else if(ctx.While()!=null){
+                    curBlock.saveBuf("br label %"+ ++counter, true);
+                    curBlock.saveBuf(counter+":", true);
+                    String loopstart ="%"+counter;
+                    visit(ctx.cond());
 
+                    blockTreeNode save_curnode = curBlock;
+                    String loop = ++counter+":";
+                    curBlock.saveBuf("br i1 "+nodenumber+",label %"+ counter+", label ", false);
+
+                    blockTreeNode loopnode = new blockTreeNode(counter, curBlock);
+                    blockTree.add(loopnode);
+                    curBlock.loopBlock= loopnode;
+                    curBlock = loopnode;
+                    curBlock.saveBuf(loop, true);
+
+                    lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
+                    visit(tmp);
+                    curBlock.saveBuf("br label "+ loopstart,true);
+                    curBlock = save_curnode;
+
+                    String dest = ++counter+":";
+                    curBlock.saveBuf("%"+counter, true);
+
+                    blockTreeNode destnode = new blockTreeNode(counter, curBlock);
+                    blockTree.add(destnode);
+                    curBlock.destBlock= destnode;
+                    curBlock = destnode;
+                    curBlock.saveBuf(dest, true);
+                }
                 break; 
             }
             case 7:{
@@ -534,7 +566,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             case 1:{
                 if(ctx.lVal()!=null){
                     visit(ctx.lVal());
-                    if(!global||nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@'){//是变量而非常量
+                    if(!global&&(nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@')){//是变量而非常量
                         curBlock.saveBuf("%"+ ++counter+"= load i32, i32* "+nodenumber, true);
                         nodenumber = "%"+counter;
                     }
@@ -854,6 +886,7 @@ class blockTreeNode{
     int counter_end;
     blockTreeNode jmpTrueBlock;
     blockTreeNode jumFalseBlock;
+    blockTreeNode loopBlock;
     blockTreeNode destBlock;
     blockTreeNode parBlock;
     List<blockTreeNode> otherBlocks = new ArrayList<>();

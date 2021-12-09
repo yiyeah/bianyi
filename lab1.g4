@@ -1,12 +1,6 @@
 //lab1.g4
 grammar lab1;
 //
-Hexadecimal_prefix : '0x' | '0X';
-Decimal_const      : [0-9] | [1-9] [0-9]+;
-Octal_const        : '0' [0-7]*;
-Hexadecimal_const  : Hexadecimal_prefix [0-9a-zA-Z]+;
-Ident              : ('_' | [a-zA-Z]) | ('_' | [a-zA-Z]) ([0-9] | ('_' | [a-zA-Z])) +;
-
 Plus               : '+';
 Sub                : '-';
 Mul                : '*';
@@ -19,6 +13,15 @@ Lt                 : '<';
 Le                 : '<=';
 Gt                 : '>';
 Ge                 : '>=';
+If                 : 'if';
+While              : 'while';
+
+Hexadecimal_prefix : '0x' | '0X';
+Decimal_const      : [0-9] | [1-9] [0-9]+;
+Octal_const        : '0' [0-7]*;
+Hexadecimal_const  : Hexadecimal_prefix [0-9a-zA-Z]+;
+Ident              : ('_' | [a-zA-Z]) | ('_' | [a-zA-Z]) ([0-9] | ('_' | [a-zA-Z])) +;
+
 
 
 WHITE_SPACE: [ \r\n\t]+ -> skip;
@@ -43,7 +46,7 @@ varDef   : Ident | Ident '=' initVal;
 initVal  : exp;
 
 stmt     :  lVal '=' exp ';'  | exp? ';' | 'return' exp ';'
-            | 'if' '(' cond ')' stmt ('else' stmt)? | block;
+            | If '(' cond ')' stmt ('else' stmt)? | block | While '(' cond ')' stmt;
 lVal     : Ident;
 exp      : addExp;
 addExp   : mulExp | addExp ( Plus | Sub) mulExp;
