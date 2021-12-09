@@ -8,7 +8,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static Parseredix parseredix = new Parseredix();
     static String nodenumber = "0";
     static int counter = 0;
-    static int calc_value;
+    static int calc_value = 0;
     static List <function> funcTable = new ArrayList<>();
     static List <varTableItem> globalvarTable = new ArrayList<>();
 
@@ -491,13 +491,15 @@ class Visitor extends lab1BaseVisitor<Void>{
                     if(!global)
                         curBlock.saveBuf("%" + (++counter) + " = sdiv i32 " + tmp1 +", "+ tmp2, true);
                     nodenumber ="%"+counter;
-                    calc_value = v1/v2;
+                    if(v2!=0)
+                        calc_value = v1/v2;
                 }
                 else if(ctx.Mod()!=null){
                     if(!global)
                         curBlock.saveBuf("%" + (++counter) + " = srem i32 " + tmp1 +", "+ tmp2, true);
                     nodenumber ="%"+counter;
-                    calc_value =v1%v2;
+                    if(v2!=0)
+                        calc_value =v1%v2;
                 }
                 
             }
@@ -900,11 +902,11 @@ class blockTreeNode{
     }
     public void saveBuf(String str, boolean n){
         if(n)
-            this.buf+=str+'\n';
-            //System.out.println(str);
+            //this.buf+=str+'\n';
+            System.out.println(str);
         else
-            this.buf+=str;
-            //System.out.print(str);
+            //this.buf+=str;
+            System.out.print(str);
     }
     public void printBuf(String str, boolean n){
         if(n)
