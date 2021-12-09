@@ -280,14 +280,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 System.exit(1);
             }
             varTableItem tableItem;
-            if(nodenumber.charAt(0)!='%'){
-                tableItem = new varTableItem(ConstName, nodenumber, "const", nodenumber);
-                globalvarTable.add(tableItem);
-            }
-            else{
-                System.out.println("global should be const error");
-                System.exit(1);
-            }        
+                tableItem = new varTableItem(ConstName, ""+calc_value, "const", ""+calc_value);
+                globalvarTable.add(tableItem);            
         }
         return null;
     }
@@ -343,7 +337,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             if(ctx.initVal()!= null){
                 visit(ctx.initVal());
                     System.out.println("@"+varName+"= dso_local global i32 "+calc_value);
-                    varTableItem tableItem = new varTableItem(varName, nodenumber, "var", "@"+varName);
+                    varTableItem tableItem = new varTableItem(varName, ""+calc_value, "var", "@"+varName);
                     globalvarTable.add(tableItem); 
       
             }
@@ -375,10 +369,14 @@ class Visitor extends lab1BaseVisitor<Void>{
         varTableItem tmp;
         if(!global)
             tmp = curBlock.findTableByName(Lval);
-        else
+        else{
             tmp = findGlobalByName(Lval);
-
+        }
         if(tmp!=null){
+            if(global&&!tmp.type.equals("const")){
+                System.out.println("global should be const error");
+                System.exit(1);
+            }
             nodenumber = tmp.address;
             if(tmp.value!=null&&tmp.value.charAt(0)!='%'){
                 calc_value =Integer.parseInt(tmp.value);
@@ -451,7 +449,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     System.out.println("global should be const error");
                     System.exit(1);
                 }
-                
+
                 if(ctx.Mul()!=null){
                     if(!global)
                         curBlock.saveBuf("%" + (++counter) + " = mul i32 " + tmp1 +", "+ tmp2, true);
@@ -537,7 +535,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             case 1:{
                 if(ctx.lVal()!=null){
                     visit(ctx.lVal());
-                    if(nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@'){//是变量而非常量
+                    if(!global||nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@'){//是变量而非常量
                         curBlock.saveBuf("%"+ ++counter+"= load i32, i32* "+nodenumber, true);
                         nodenumber = "%"+counter;
                     }
