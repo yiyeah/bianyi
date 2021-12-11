@@ -15,6 +15,8 @@ Gt                 : '>';
 Ge                 : '>=';
 If                 : 'if';
 While              : 'while';
+Break              : 'break';
+Continue           : 'continue';
 
 Hexadecimal_prefix : '0x' | '0X';
 Decimal_const      : [0-9] | [1-9] [0-9]+;
@@ -46,7 +48,8 @@ varDef   : Ident | Ident '=' initVal;
 initVal  : exp;
 
 stmt     :  lVal '=' exp ';'  | exp? ';' | 'return' exp ';'
-            | If '(' cond ')' stmt ('else' stmt)? | block | While '(' cond ')' stmt;
+            | If '(' cond ')' stmt ('else' stmt)? | block 
+            | While '(' cond ')' stmt | Continue ';' | Break ';';
 lVal     : Ident;
 exp      : addExp;
 addExp   : mulExp | addExp ( Plus | Sub) mulExp;
