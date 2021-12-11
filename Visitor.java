@@ -19,7 +19,8 @@ class Visitor extends lab1BaseVisitor<Void>{
     static List<blockTreeNode> blockTree = new ArrayList<>();
     static int[] blockStart ={0,};
     static blockTreeNode curBlock = root;
-
+    static String loopNow="0";
+    static List<blockTreeNode> breaknodeStack = new ArrayList<>();
     @Override
     public Void visitCompUnit(lab1Parser.CompUnitContext ctx) {
         init();
@@ -121,8 +122,15 @@ class Visitor extends lab1BaseVisitor<Void>{
                     break;
             }
             case 2:{
-                // exp? ';'
-                if(ctx.exp()!=null){
+                // exp? ';' || contine ';' || break ';'
+                if(ctx.Break()!=null){
+                    breaknodeStack.add(curBlock);
+                    return null;
+                }
+                else if(ctx.Continue()!=null){
+                    curBlock.saveBuf("br label "+ loopNow, true);
+                }
+                else if(ctx.exp()!=null){
                     visit(ctx.exp());
                 }
                 break;
@@ -155,7 +163,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 break;
             } 
             case 5:{
-                // If '(' cond ')' stmt
+                // If '(' cond ')' stmt || While ( cond ) stmt
                 if(ctx.If()!=null){         
                     visit(ctx.cond());
 
@@ -172,13 +180,14 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                     lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
                     visit(tmp);
-                    if(need_br(curBlock))
-                        curBlock.saveBuf("br label %"+ ++counter,true);
+                    if(need_br(curBlock)&& !breaknodeStack.contains(curBlock))
+                        curBlock.saveBuf("br label %"+ (counter+1),true);
+
                     curBlock = save_curnode;
                     
-                    String dest = counter+":";
+                    String dest = ++counter + ":";
                     curBlock.saveBuf("%"+counter, true);
-
+                    
                     blockTreeNode destnode = new blockTreeNode(counter, curBlock);
                     blockTree.add(destnode);
                     curBlock.destBlock= destnode;
@@ -189,6 +198,11 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.saveBuf("br label %"+ ++counter, true);
                     curBlock.saveBuf(counter+":", true);
                     String loopstart ="%"+counter;
+                    String save_loopNow="0";
+                    if(!loopNow.equals("0")){
+                        save_loopNow = loopNow;
+                    }
+                    loopNow = loopstart;
                     visit(ctx.cond());
 
                     blockTreeNode save_curnode = curBlock;
@@ -197,23 +211,32 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                     blockTreeNode loopnode = new blockTreeNode(counter, curBlock);
                     blockTree.add(loopnode);
+                
                     curBlock.loopBlock= loopnode;
                     curBlock = loopnode;
                     curBlock.saveBuf(loop, true);
 
                     lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
                     visit(tmp);
-                    curBlock.saveBuf("br label "+ loopstart,true);
+                    if(need_br(curBlock)&&!breaknodeStack.contains(curBlock))
+                        curBlock.saveBuf("br label "+ loopstart,true);
                     curBlock = save_curnode;
-
+                 
                     String dest = ++counter+":";
                     curBlock.saveBuf("%"+counter, true);
+
+                    for(blockTreeNode breaknode: breaknodeStack){
+                        breaknode.saveBuf("br label %"+counter, true);
+                    }
+                    breaknodeStack.clear();;
 
                     blockTreeNode destnode = new blockTreeNode(counter, curBlock);
                     blockTree.add(destnode);
                     curBlock.destBlock= destnode;
                     curBlock = destnode;
                     curBlock.saveBuf(dest, true);
+                    if(!save_loopNow.equals("0"))
+                        loopNow = save_loopNow;
                 }
                 break; 
             }
@@ -249,7 +272,7 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                 tmp = ctx.stmt().get(1);         
                 visit(tmp);
-                if(curBlock!=root && curBlock.parBlock.destBlock!=null&&curBlock.parBlock.destBlock.equals(curBlock) &&need_br(curBlock)){
+                if(curBlock!=root && curBlock.parBlock.destBlock!=null&&curBlock.parBlock.destBlock.equals(curBlock) &&need_br(curBlock) &&!breaknodeStack.contains(curBlock)){
                     curBlock.saveBuf("br label %"+(counter+1) ,true);
                 }
 
