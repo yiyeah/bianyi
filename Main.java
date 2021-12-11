@@ -40,7 +40,7 @@ public class Main {
 
             ParseTree tree = parser.compUnit(); // 获取语法树的根节点
 
-           // System.out.println(tree.toStringTree(parser));//dayin
+            //System.out.println(tree.toStringTree(parser));//dayin
 
             Visitor visitor = new Visitor();
             visitor.visit(tree);
