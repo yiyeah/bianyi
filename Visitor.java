@@ -180,7 +180,7 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                     lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
                     visit(tmp);
-                    if(need_br(curBlock)&& !breaknodeStack.contains(curBlock))
+                    if(need_br(curBlock))
                         curBlock.saveBuf("br label %"+ (counter+1),true);
 
                     curBlock = save_curnode;
@@ -218,7 +218,7 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                     lab1Parser.StmtContext tmp = ctx.stmt().get(0);         
                     visit(tmp);
-                    if(need_br(curBlock)&&!breaknodeStack.contains(curBlock))
+                    if(need_br(curBlock))
                         curBlock.saveBuf("br label "+ loopstart,true);
                     curBlock = save_curnode;
                  
@@ -272,7 +272,7 @@ class Visitor extends lab1BaseVisitor<Void>{
 
                 tmp = ctx.stmt().get(1);         
                 visit(tmp);
-                if(curBlock!=root && curBlock.parBlock.destBlock!=null&&curBlock.parBlock.destBlock.equals(curBlock) &&need_br(curBlock) &&!breaknodeStack.contains(curBlock)){
+                if(curBlock!=root && curBlock.parBlock.destBlock!=null&&curBlock.parBlock.destBlock.equals(curBlock) &&need_br(curBlock)){
                     curBlock.saveBuf("br label %"+(counter+1) ,true);
                 }
 
@@ -285,7 +285,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 if(curBlock.jmpTrueBlock.destBlock!=null && need_br(curBlock.jmpTrueBlock.destBlock))
                     curBlock.jmpTrueBlock.destBlock.saveBuf("br label %"+counter,true);
                 if(curBlock.jumFalseBlock.jmpTrueBlock==null && need_br(curBlock.jumFalseBlock))
-                    curBlock.jumFalseBlock.saveBuf("br label %"+counter,true);
+                    curBlock.jumFalseBlock.saveBuf("br label %%"+counter,true);
 
                 blockTreeNode destnode = new blockTreeNode(counter, curBlock);
                 blockTree.add(destnode);
@@ -826,6 +826,8 @@ class Visitor extends lab1BaseVisitor<Void>{
     }
 
     public static boolean need_br(blockTreeNode b){
+        if(breaknodeStack.contains(b))
+            return false;
         String buf = b.buf;
         int len = buf.length();
         if(len == 0){
