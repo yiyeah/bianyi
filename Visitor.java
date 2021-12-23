@@ -618,7 +618,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     }
                 }
                 else{
-                    curBlock.saveBuf("%"+ ++counter +"= gggetelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 "+ offset, true);
+                    curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 "+ offset, true);
                     curBlock.saveBuf("store i32 "+nodenumber+", i32* %"+counter, true);
                 }       
                 tmpArr.array.data[offset] = nodenumber;
