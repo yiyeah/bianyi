@@ -1291,11 +1291,11 @@ class blockTreeNode{
     }
     public void saveBuf(String str, boolean n){
         if(n)
-            //this.buf+=str+'\n';
-            System.out.println(str);
+            this.buf+=str+'\n';
+            //System.out.println(str);
         else
-            //this.buf+=str;
-            System.out.print(str);
+            this.buf+=str;
+            //System.out.print(str);
     }
     public void printBuf(String str, boolean n){
         if(n)
