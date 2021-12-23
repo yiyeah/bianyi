@@ -1183,7 +1183,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             String ofset ="%"+counter;
             for(int i =0; i<len; i++){
                 for(int j=i+1;j<len;j++){
-                    curBlock.saveBuf("%"+ ++counter+"= mul i32 "+temp+" "+arr_dim_data[j],true);
+                    curBlock.saveBuf("%"+ ++counter+"= mul i32 "+temp+", "+arr_dim_data[j],true);
                     temp ="%"+counter;
                 }
                 curBlock.saveBuf("%"+ ++counter+"= mul i32 "+temp+", "+visit_arr_index[i],true);
