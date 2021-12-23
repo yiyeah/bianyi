@@ -712,7 +712,8 @@ class Visitor extends lab1BaseVisitor<Void>{
 
             if(offset.charAt(0)!='%'){
                 int off = Integer.parseInt(offset);
-                calc_value =Integer.parseInt(tmp.array.data[off]);
+                if(tmp.array.data[off].charAt(0)!='%')
+                    calc_value =Integer.parseInt(tmp.array.data[off]);
             }
                
         }
