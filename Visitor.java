@@ -9,6 +9,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static String nodenumber = "0";
     static int counter = 0;
     static int calc_value = 0;
+    static boolean calc_value_flag = false;
     static List <function> funcTable = new ArrayList<>();
     static List <varTableItem> globalvarTable = new ArrayList<>();
 
@@ -165,7 +166,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 visit(ctx.lVal());
                 String lval_addr = nodenumber;
                 varTableItem tmp =curBlock.findTableByAddr(lval_addr);
-                if(tmp.type.equals("const")){
+                if(tmp!=null&&tmp.type.equals("const")){
+                        //array tmp is null
                     System.out.println("const lval assign error ");
                     System.exit(1);
                 }
@@ -350,6 +352,9 @@ class Visitor extends lab1BaseVisitor<Void>{
             arr.dim = dim;
             arr.len = len;
             arr.data = new String[len];
+            for(int j=0;j<len;j++){
+                arr.data[j]="0";
+            }
             tableItem.array=arr;
             tmpArr = tableItem;        
             if(!global){
@@ -357,7 +362,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 curBlock.saveBuf("%"+ counter+ " = alloca ["+len+ " x i32]", true);
                 arr_address = "%"+counter;
                 curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 0", true);
-                curBlock.saveBuf("call void @memset(i32* %"+counter+", i32 0, i32 "+4*len+")", true);
+                curBlock.saveBuf("call void @memset(i32* %"+counter+", i32 0, i32 "+4*len+")", true);             
             //初始时就分配好0的初值;
             }
             else{
@@ -514,6 +519,9 @@ class Visitor extends lab1BaseVisitor<Void>{
             arr.dim = dim;
             arr.len = len;
             arr.data = new String[len];
+            for(int j=0;j<len;j++){
+                arr.data[j]="0";
+            }
             tableItem.array=arr;
             tmpArr = tableItem;
 
@@ -535,7 +543,9 @@ class Visitor extends lab1BaseVisitor<Void>{
             visit_arr_index =new int[dim];
             InArray = true;
             if(ctx.initVal()==null){
-                System.out.println(" zeroinitializer");
+                if(global)
+                    System.out.println(" zeroinitializer");
+                return null;
             }
             else
                 visit(ctx.initVal()); 
@@ -601,8 +611,10 @@ class Visitor extends lab1BaseVisitor<Void>{
                         System.out.print("i32 "+calc_value);
                         index++;
                     }
-                    else
+                    else{
                         System.out.print(",i32 "+calc_value);
+                        index++;
+                    }
                 }
                 else{
                     curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 "+ offset, true);
@@ -635,12 +647,13 @@ class Visitor extends lab1BaseVisitor<Void>{
                 } 
                 int zeronum = getZeroNum(i, arr_dim_data, deep-1);
                 for(i=0;i<zeronum;i++){
-                    if(index!=0)
+                    if(index!=0){
                         System.out.print(",i32 0");
-                    else{
-                        System.out.print("i32 0");
-                        index++;
                     }
+                    else{
+                        System.out.print("i32 0"); 
+                    }
+                    index++;
                 }
                 if(global&&deep==1){
                     System.out.println(" ]");
@@ -675,9 +688,9 @@ class Visitor extends lab1BaseVisitor<Void>{
         if(ctx.children.size()>1){
             //a[][][] array
             int dim = ctx.exp().size();
-            int[] visit_arr_index, arr_dim_data;
-            
-            visit_arr_index = new int[dim];
+            int[]  arr_dim_data;
+            String[] visit_arr_index;
+            visit_arr_index = new String[dim];
 
             if(dim!=tmp.array.dim){
                 System.out.println("array dim error");
@@ -689,13 +702,19 @@ class Visitor extends lab1BaseVisitor<Void>{
             int i=0;
             for(lab1Parser.ExpContext tmpExp: ctx.exp()){
                 visit(tmpExp);
-                visit_arr_index[i] = calc_value;
+                visit_arr_index[i] = nodenumber;//bug
                 i++;
             }
-            int offset = getOffset(arr_dim_data, visit_arr_index);
+            String offset = getVarOffset(arr_dim_data, visit_arr_index);
             
             curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ tmp.address+", i32 0, i32 "+ offset, true);
             nodenumber = "%"+counter;
+
+            if(offset.charAt(0)!='%'){
+                int off = Integer.parseInt(offset);
+                calc_value =Integer.parseInt(tmp.array.data[off]);
+            }
+               
         }
         else{    
             if(global&&!tmp.type.equals("const")){
@@ -704,7 +723,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             nodenumber = tmp.address;
             if(tmp.value!=null&&tmp.value.charAt(0)!='%'){
-                calc_value =Integer.parseInt(tmp.value);
+                calc_value =Integer.parseInt(tmp.value);           
             }
             
         }
@@ -1139,6 +1158,42 @@ class Visitor extends lab1BaseVisitor<Void>{
         return offset;
     }
 
+    public static String getVarOffset(int[] arr_dim_data, String[] visit_arr_index){
+        boolean constflag = true;
+        int len = arr_dim_data.length,k=0;
+        int[] visit_arr_int = new int[len];
+        for(String tmp: visit_arr_index){
+            if(tmp.charAt(0)=='%'){
+                constflag = false;
+                break;
+            }
+            visit_arr_int[k] =Integer.parseInt(tmp);
+            k++;
+        }
+        if(constflag) {
+            int ret = getOffset(arr_dim_data,visit_arr_int);
+            return ret+"";
+        }
+        else {
+            System.out.println("%"+ ++counter+"= add i32 1 , 0");
+            String temp ="%"+counter;
+            String tmp0 ="%"+counter;
+            System.out.println("%"+ ++counter+"= add i32 0 , 0");
+            String ofset ="%"+counter;
+            for(int i =0; i<len; i++){
+                for(int j=i+1;j<len;j++){
+                    System.out.println("%"+ ++counter+"= mul i32 "+temp+" "+arr_dim_data[j]);
+                    temp ="%"+counter;
+                }
+                System.out.println("%"+ ++counter+"= mul i32 "+temp+", "+visit_arr_index[i]);
+                System.out.println("%"+ ++counter+"= add i32 %"+(counter-1)+", "+ofset);
+                ofset ="%"+counter;
+                temp = tmp0;
+            }
+            return "%"+counter;
+        }
+    }
+
     public static int getZeroNum(int i, int[] arr_dim_data, int dim){
         if(dim>arr_dim_data.length || i>= arr_dim_data[dim])
             return 0;
@@ -1190,6 +1245,11 @@ class varTableItem{
         this.value = value;
         this.type = type;
         this.address = address;
+    }
+    @Override
+    public String toString() {
+        return "varTableItem [address=" + address + ", type=" + type + ", value=" + value + ", varName=" + varName
+                + "]";
     }
 }
 
