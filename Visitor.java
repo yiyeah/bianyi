@@ -349,7 +349,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             arr.dim = dim;
             arr.len = len;
-            arr.data = new int[len];
+            arr.data = new String[len];
             tableItem.array=arr;
             tmpArr = tableItem;        
             if(!global){
@@ -427,7 +427,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 "+ offset, true);
                     curBlock.saveBuf("store i32 "+calc_value+", i32* %"+counter, true);
                 }        
-                tmpArr.array.data[offset] = calc_value;
+                tmpArr.array.data[offset] = ""+calc_value;
             }
         }       
         else{
@@ -513,7 +513,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             arr.dim = dim;
             arr.len = len;
-            arr.data = new int[len];
+            arr.data = new String[len];
             tableItem.array=arr;
             tmpArr = tableItem;
 
@@ -606,9 +606,9 @@ class Visitor extends lab1BaseVisitor<Void>{
                 }
                 else{
                     curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ arr_address +", i32 0, i32 "+ offset, true);
-                    curBlock.saveBuf("store i32 "+calc_value+", i32* %"+counter, true);
+                    curBlock.saveBuf("store i32 "+nodenumber+", i32* %"+counter, true);
                 }       
-                tmpArr.array.data[offset] = calc_value;
+                tmpArr.array.data[offset] = nodenumber;
             }
         }
         else{
@@ -628,7 +628,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             else{
                 int initValue,i=0;
                 if(global&&deep==1)System.out.print(" [");
-               for(lab1Parser.InitValContext tmpInit: ctx.initVal()){
+                for(lab1Parser.InitValContext tmpInit: ctx.initVal()){
                     visit_arr_index[deep-1]=i;
                     visit(tmpInit);
                     i++;
@@ -675,6 +675,8 @@ class Visitor extends lab1BaseVisitor<Void>{
         if(ctx.children.size()>1){
             //a[][][] array
             int dim = ctx.exp().size();
+            int[] visit_arr_index, arr_dim_data;
+            
             visit_arr_index = new int[dim];
 
             if(dim!=tmp.array.dim){
@@ -1193,7 +1195,7 @@ class varTableItem{
 
 class arrayStruct{
     int[] every_dim;
-    int[] data;
+    String[] data;
     int dim;
     int len;
 }
