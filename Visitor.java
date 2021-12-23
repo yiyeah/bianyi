@@ -546,8 +546,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                 if(global)
                     System.out.println(" zeroinitializer");
                 InArray = false;
-                deep = 0;
-                index = 0;
                 return null;
             }
             else
