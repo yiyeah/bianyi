@@ -750,7 +750,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 String tmp2 =nodenumber;
                 int v2 = calc_value;
 
-                if(global&&(tmp1.charAt(0)=='%'||tmp2.charAt(0)=='%')){
+                if(global&&((tmp1.charAt(0)=='%'||tmp2.charAt(0)=='%')&&tmp1.charAt(1)!='0'&&tmp2.charAt(1)!='0')){
                     System.out.println("global should be const error");
                     System.exit(1);
                 }
