@@ -299,7 +299,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 if(curBlock.jmpTrueBlock.destBlock!=null && need_br(curBlock.jmpTrueBlock.destBlock))
                     curBlock.jmpTrueBlock.destBlock.saveBuf("br label %"+counter,true);
                 if(curBlock.jumFalseBlock.jmpTrueBlock==null && need_br(curBlock.jumFalseBlock))
-                    curBlock.jumFalseBlock.saveBuf("br label %%"+counter,true);
+                    curBlock.jumFalseBlock.saveBuf("br label %"+counter,true);
 
                 blockTreeNode destnode = new blockTreeNode(counter, curBlock);
                 blockTree.add(destnode);
