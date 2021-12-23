@@ -1176,18 +1176,18 @@ class Visitor extends lab1BaseVisitor<Void>{
             return ret+"";
         }
         else {
-            System.out.println("%"+ ++counter+"= add i32 1 , 0");
+            curBlock.saveBuf("%"+ ++counter+"= add i32 1 , 0",true);
             String temp ="%"+counter;
             String tmp0 ="%"+counter;
-            System.out.println("%"+ ++counter+"= add i32 0 , 0");
+            curBlock.saveBuf("%"+ ++counter+"= add i32 0 , 0",true);
             String ofset ="%"+counter;
             for(int i =0; i<len; i++){
                 for(int j=i+1;j<len;j++){
-                    System.out.println("%"+ ++counter+"= mul i32 "+temp+" "+arr_dim_data[j]);
+                    curBlock.saveBuf("%"+ ++counter+"= mul i32 "+temp+" "+arr_dim_data[j],true);
                     temp ="%"+counter;
                 }
-                System.out.println("%"+ ++counter+"= mul i32 "+temp+", "+visit_arr_index[i]);
-                System.out.println("%"+ ++counter+"= add i32 %"+(counter-1)+", "+ofset);
+                curBlock.saveBuf("%"+ ++counter+"= mul i32 "+temp+", "+visit_arr_index[i],true);
+                curBlock.saveBuf("%"+ ++counter+"= add i32 %"+(counter-1)+", "+ofset,true);
                 ofset ="%"+counter;
                 temp = tmp0;
             }
