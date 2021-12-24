@@ -180,6 +180,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 // If '(' cond ')' stmt || While ( cond ) stmt
                 if(ctx.If()!=null){         
                     visit(ctx.cond());
+                    curBlock.saveBuf("%"+(++counter)+" = icmp eq i32 "+nodenumber +", 0", true);
+                    nodenumber = "%"+counter;
 
                     blockTreeNode save_curnode = curBlock;
 
@@ -218,6 +220,9 @@ class Visitor extends lab1BaseVisitor<Void>{
                     }
                     loopNow = loopstart;
                     visit(ctx.cond());
+
+                    curBlock.saveBuf("%"+(++counter)+" = icmp eq i32 "+nodenumber +", 0", true);
+                    nodenumber = "%"+counter;
 
                     blockTreeNode save_curnode = curBlock;
                     String loop = ++counter+":";
