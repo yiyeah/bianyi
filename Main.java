@@ -85,6 +85,6 @@ class Prepare {
                     }
                 }
             }
-        return returnline;
+        return returnline+'\n';
     }
 }
