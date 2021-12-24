@@ -1013,7 +1013,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 }
                 else{
                     if(ctx.getParent().children.size()== 1&&(ctx.getParent().getParent().children.size()== 1||ctx.getParent().getParent().children.size()==4)){
-                        curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+nodenumber+", 0", true);
+                        curBlock.saveBuf("%"+ ++counter +" = icmp ne i32 "+nodenumber+", 0", true);
                         nodenumber ="%"+counter;
                     }
                 }
