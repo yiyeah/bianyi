@@ -7,6 +7,7 @@ Mul                : '*';
 Div                : '/';
 Mod                : '%';
 Not                : '!';
+Logic_And          : '&';
 Equal              : '==';
 NEqual             : '!=';
 Lt                 : '<';
@@ -18,13 +19,12 @@ While              : 'while';
 Break              : 'break';
 Continue           : 'continue';
 
+
 Hexadecimal_prefix : '0x' | '0X';
 Decimal_const      : [0-9] | [1-9] [0-9]+;
 Octal_const        : '0' [0-7]*;
 Hexadecimal_const  : Hexadecimal_prefix [0-9a-zA-Z]+;
 Ident              : ('_' | [a-zA-Z]) | ('_' | [a-zA-Z]) ([0-9] | ('_' | [a-zA-Z])) +;
-
-
 
 WHITE_SPACE: [ \r\n\t]+ -> skip;
 
@@ -65,7 +65,7 @@ funcParams: exp (',' exp)*;
 //cond
 cond     : lOrExp;
 lOrExp   : lAndExp| lOrExp '||' lAndExp;
-lAndExp  : eqExp | lAndExp '&&' eqExp ;
+lAndExp  : eqExp | lAndExp Logic_And Logic_And eqExp ;
 eqExp    : relExp | eqExp (Equal | NEqual) relExp;
 relExp   : addExp | relExp (Lt | Le | Gt | Ge) addExp;
 

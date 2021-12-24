@@ -17,9 +17,9 @@ public class lab1Parser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, Plus=16, Sub=17, 
-		Mul=18, Div=19, Mod=20, Not=21, Equal=22, NEqual=23, Lt=24, Le=25, Gt=26, 
-		Ge=27, If=28, While=29, Break=30, Continue=31, Hexadecimal_prefix=32, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, Plus=15, Sub=16, Mul=17, 
+		Div=18, Mod=19, Not=20, Logic_And=21, Equal=22, NEqual=23, Lt=24, Le=25, 
+		Gt=26, Ge=27, If=28, While=29, Break=30, Continue=31, Hexadecimal_prefix=32, 
 		Decimal_const=33, Octal_const=34, Hexadecimal_const=35, Ident=36, WHITE_SPACE=37;
 	public static final int
 		RULE_compUnit = 0, RULE_funcDef = 1, RULE_funcType = 2, RULE_block = 3, 
@@ -43,8 +43,8 @@ public class lab1Parser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'('", "')'", "'int'", "'{'", "'}'", "'const'", "','", "';'", "'['", 
-			"']'", "'='", "'return'", "'else'", "'||'", "'&&'", "'+'", "'-'", "'*'", 
-			"'/'", "'%'", "'!'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'if'", 
+			"']'", "'='", "'return'", "'else'", "'||'", "'+'", "'-'", "'*'", "'/'", 
+			"'%'", "'!'", "'&'", "'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'if'", 
 			"'while'", "'break'", "'continue'"
 		};
 	}
@@ -52,8 +52,8 @@ public class lab1Parser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, "Plus", "Sub", "Mul", "Div", "Mod", "Not", "Equal", 
-			"NEqual", "Lt", "Le", "Gt", "Ge", "If", "While", "Break", "Continue", 
+			null, null, null, "Plus", "Sub", "Mul", "Div", "Mod", "Not", "Logic_And", 
+			"Equal", "NEqual", "Lt", "Le", "Gt", "Ge", "If", "While", "Break", "Continue", 
 			"Hexadecimal_prefix", "Decimal_const", "Octal_const", "Hexadecimal_const", 
 			"Ident", "WHITE_SPACE"
 		};
@@ -2032,6 +2032,10 @@ public class lab1Parser extends Parser {
 		public LAndExpContext lAndExp() {
 			return getRuleContext(LAndExpContext.class,0);
 		}
+		public List<TerminalNode> Logic_And() { return getTokens(lab1Parser.Logic_And); }
+		public TerminalNode Logic_And(int i) {
+			return getToken(lab1Parser.Logic_And, i);
+		}
 		public LAndExpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2071,7 +2075,7 @@ public class lab1Parser extends Parser {
 			eqExp(0);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(307);
+			setState(308);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,27,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -2085,13 +2089,15 @@ public class lab1Parser extends Parser {
 					setState(302);
 					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(303);
-					match(T__14);
+					match(Logic_And);
 					setState(304);
+					match(Logic_And);
+					setState(305);
 					eqExp(0);
 					}
 					} 
 				}
-				setState(309);
+				setState(310);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,27,_ctx);
 			}
@@ -2153,11 +2159,11 @@ public class lab1Parser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(311);
+			setState(312);
 			relExp(0);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(318);
+			setState(319);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,28,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -2168,9 +2174,9 @@ public class lab1Parser extends Parser {
 					{
 					_localctx = new EqExpContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_eqExp);
-					setState(313);
-					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(314);
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+					setState(315);
 					_la = _input.LA(1);
 					if ( !(_la==Equal || _la==NEqual) ) {
 					_errHandler.recoverInline(this);
@@ -2180,12 +2186,12 @@ public class lab1Parser extends Parser {
 						_errHandler.reportMatch(this);
 						consume();
 					}
-					setState(315);
+					setState(316);
 					relExp(0);
 					}
 					} 
 				}
-				setState(320);
+				setState(321);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,28,_ctx);
 			}
@@ -2249,11 +2255,11 @@ public class lab1Parser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			{
-			setState(322);
+			setState(323);
 			addExp(0);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(329);
+			setState(330);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,29,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -2264,9 +2270,9 @@ public class lab1Parser extends Parser {
 					{
 					_localctx = new RelExpContext(_parentctx, _parentState);
 					pushNewRecursionContext(_localctx, _startState, RULE_relExp);
-					setState(324);
-					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(325);
+					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
+					setState(326);
 					_la = _input.LA(1);
 					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << Lt) | (1L << Le) | (1L << Gt) | (1L << Ge))) != 0)) ) {
 					_errHandler.recoverInline(this);
@@ -2276,12 +2282,12 @@ public class lab1Parser extends Parser {
 						_errHandler.reportMatch(this);
 						consume();
 					}
-					setState(326);
+					setState(327);
 					addExp(0);
 					}
 					} 
 				}
-				setState(331);
+				setState(332);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,29,_ctx);
 			}
@@ -2359,7 +2365,7 @@ public class lab1Parser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\'\u014f\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\'\u0150\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -2383,18 +2389,18 @@ public class lab1Parser extends Parser {
 		"\5\25\u010b\n\25\3\26\3\26\3\26\3\26\3\26\3\26\5\26\u0113\n\26\3\27\3"+
 		"\27\3\30\3\30\3\31\3\31\3\31\7\31\u011c\n\31\f\31\16\31\u011f\13\31\3"+
 		"\32\3\32\3\33\3\33\3\33\3\33\3\33\3\33\7\33\u0129\n\33\f\33\16\33\u012c"+
-		"\13\33\3\34\3\34\3\34\3\34\3\34\3\34\7\34\u0134\n\34\f\34\16\34\u0137"+
-		"\13\34\3\35\3\35\3\35\3\35\3\35\3\35\7\35\u013f\n\35\f\35\16\35\u0142"+
-		"\13\35\3\36\3\36\3\36\3\36\3\36\3\36\7\36\u014a\n\36\f\36\16\36\u014d"+
+		"\13\33\3\34\3\34\3\34\3\34\3\34\3\34\3\34\7\34\u0135\n\34\f\34\16\34\u0138"+
+		"\13\34\3\35\3\35\3\35\3\35\3\35\3\35\7\35\u0140\n\35\f\35\16\35\u0143"+
+		"\13\35\3\36\3\36\3\36\3\36\3\36\3\36\7\36\u014b\n\36\f\36\16\36\u014e"+
 		"\13\36\3\36\2\b$&\64\668:\37\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \""+
-		"$&(*,.\60\62\64\668:\2\b\3\2\22\23\3\2\24\26\4\2\22\23\27\27\3\2#%\3\2"+
-		"\30\31\3\2\32\35\2\u0157\2?\3\2\2\2\4D\3\2\2\2\6J\3\2\2\2\bL\3\2\2\2\n"+
+		"$&(*,.\60\62\64\668:\2\b\3\2\21\22\3\2\23\25\4\2\21\22\26\26\3\2#%\3\2"+
+		"\30\31\3\2\32\35\2\u0158\2?\3\2\2\2\4D\3\2\2\2\6J\3\2\2\2\bL\3\2\2\2\n"+
 		"W\3\2\2\2\f[\3\2\2\2\16]\3\2\2\2\20i\3\2\2\2\22k\3\2\2\2\24\u0085\3\2"+
 		"\2\2\26\u0087\3\2\2\2\30\u0089\3\2\2\2\32\u00aa\3\2\2\2\34\u00b9\3\2\2"+
 		"\2\36\u00dc\3\2\2\2 \u00de\3\2\2\2\"\u00e8\3\2\2\2$\u00ea\3\2\2\2&\u00f5"+
 		"\3\2\2\2(\u010a\3\2\2\2*\u0112\3\2\2\2,\u0114\3\2\2\2.\u0116\3\2\2\2\60"+
-		"\u0118\3\2\2\2\62\u0120\3\2\2\2\64\u0122\3\2\2\2\66\u012d\3\2\2\28\u0138"+
-		"\3\2\2\2:\u0143\3\2\2\2<>\5\f\7\2=<\3\2\2\2>A\3\2\2\2?=\3\2\2\2?@\3\2"+
+		"\u0118\3\2\2\2\62\u0120\3\2\2\2\64\u0122\3\2\2\2\66\u012d\3\2\2\28\u0139"+
+		"\3\2\2\2:\u0144\3\2\2\2<>\5\f\7\2=<\3\2\2\2>A\3\2\2\2?=\3\2\2\2?@\3\2"+
 		"\2\2@B\3\2\2\2A?\3\2\2\2BC\5\4\3\2C\3\3\2\2\2DE\5\6\4\2EF\7&\2\2FG\7\3"+
 		"\2\2GH\7\4\2\2HI\5\b\5\2I\5\3\2\2\2JK\7\5\2\2K\7\3\2\2\2LP\7\6\2\2MO\5"+
 		"\n\6\2NM\3\2\2\2OR\3\2\2\2PN\3\2\2\2PQ\3\2\2\2QS\3\2\2\2RP\3\2\2\2ST\7"+
@@ -2463,18 +2469,18 @@ public class lab1Parser extends Parser {
 		"\2\u0126\u0127\7\20\2\2\u0127\u0129\5\66\34\2\u0128\u0125\3\2\2\2\u0129"+
 		"\u012c\3\2\2\2\u012a\u0128\3\2\2\2\u012a\u012b\3\2\2\2\u012b\65\3\2\2"+
 		"\2\u012c\u012a\3\2\2\2\u012d\u012e\b\34\1\2\u012e\u012f\58\35\2\u012f"+
-		"\u0135\3\2\2\2\u0130\u0131\f\3\2\2\u0131\u0132\7\21\2\2\u0132\u0134\5"+
-		"8\35\2\u0133\u0130\3\2\2\2\u0134\u0137\3\2\2\2\u0135\u0133\3\2\2\2\u0135"+
-		"\u0136\3\2\2\2\u0136\67\3\2\2\2\u0137\u0135\3\2\2\2\u0138\u0139\b\35\1"+
-		"\2\u0139\u013a\5:\36\2\u013a\u0140\3\2\2\2\u013b\u013c\f\3\2\2\u013c\u013d"+
-		"\t\6\2\2\u013d\u013f\5:\36\2\u013e\u013b\3\2\2\2\u013f\u0142\3\2\2\2\u0140"+
-		"\u013e\3\2\2\2\u0140\u0141\3\2\2\2\u01419\3\2\2\2\u0142\u0140\3\2\2\2"+
-		"\u0143\u0144\b\36\1\2\u0144\u0145\5$\23\2\u0145\u014b\3\2\2\2\u0146\u0147"+
-		"\f\3\2\2\u0147\u0148\t\7\2\2\u0148\u014a\5$\23\2\u0149\u0146\3\2\2\2\u014a"+
-		"\u014d\3\2\2\2\u014b\u0149\3\2\2\2\u014b\u014c\3\2\2\2\u014c;\3\2\2\2"+
-		"\u014d\u014b\3\2\2\2 ?PW[dr\177\u0082\u0085\u008f\u009b\u00a5\u00aa\u00b3"+
-		"\u00b6\u00b9\u00c1\u00cf\u00dc\u00e5\u00f2\u00fd\u0107\u010a\u0112\u011d"+
-		"\u012a\u0135\u0140\u014b";
+		"\u0136\3\2\2\2\u0130\u0131\f\3\2\2\u0131\u0132\7\27\2\2\u0132\u0133\7"+
+		"\27\2\2\u0133\u0135\58\35\2\u0134\u0130\3\2\2\2\u0135\u0138\3\2\2\2\u0136"+
+		"\u0134\3\2\2\2\u0136\u0137\3\2\2\2\u0137\67\3\2\2\2\u0138\u0136\3\2\2"+
+		"\2\u0139\u013a\b\35\1\2\u013a\u013b\5:\36\2\u013b\u0141\3\2\2\2\u013c"+
+		"\u013d\f\3\2\2\u013d\u013e\t\6\2\2\u013e\u0140\5:\36\2\u013f\u013c\3\2"+
+		"\2\2\u0140\u0143\3\2\2\2\u0141\u013f\3\2\2\2\u0141\u0142\3\2\2\2\u0142"+
+		"9\3\2\2\2\u0143\u0141\3\2\2\2\u0144\u0145\b\36\1\2\u0145\u0146\5$\23\2"+
+		"\u0146\u014c\3\2\2\2\u0147\u0148\f\3\2\2\u0148\u0149\t\7\2\2\u0149\u014b"+
+		"\5$\23\2\u014a\u0147\3\2\2\2\u014b\u014e\3\2\2\2\u014c\u014a\3\2\2\2\u014c"+
+		"\u014d\3\2\2\2\u014d;\3\2\2\2\u014e\u014c\3\2\2\2 ?PW[dr\177\u0082\u0085"+
+		"\u008f\u009b\u00a5\u00aa\u00b3\u00b6\u00b9\u00c1\u00cf\u00dc\u00e5\u00f2"+
+		"\u00fd\u0107\u010a\u0112\u011d\u012a\u0136\u0141\u014c";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

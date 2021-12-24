@@ -956,8 +956,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 visit(ctx.eqExp());
                 break;
             }
-            case 3:{
-                // lAndExp '&&' eqExp
+            case 4:{
+                // lAndExp & & eqExp
                 visit(ctx.lAndExp());
                 String tmp1 = nodenumber;
 
@@ -1012,8 +1012,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                     zext_i1 = false;
                 }
                 else{
-                    if(ctx.getParent().children.size()== 1&&ctx.getParent().getParent().children.size()== 1){
-                        curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+nodenumber+", 0", true);
+                    if(ctx.getParent().children.size()== 1&&(ctx.getParent().getParent().children.size()== 1||ctx.getParent().getParent().children.size()==4)){
+                        curBlock.saveBuf("%"+ ++counter +" = icmp ne i32 "+nodenumber+", 0", true);
                         nodenumber ="%"+counter;
                     }
                 }
