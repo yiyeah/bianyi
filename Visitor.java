@@ -14,7 +14,6 @@ class Visitor extends lab1BaseVisitor<Void>{
     static List <varTableItem> globalvarTable = new ArrayList<>();
 
     static boolean zext_i1 = false;
-    static boolean need_i1 = true;
     static boolean global = true;
 
     static blockTreeNode root = new blockTreeNode(0, null);
@@ -179,8 +178,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             } 
             case 5:{
                 // If '(' cond ')' stmt || While ( cond ) stmt
-                if(ctx.If()!=null){
-                    need_i1 = true;         
+                if(ctx.If()!=null){        
                     visit(ctx.cond());
 
                     blockTreeNode save_curnode = curBlock;
@@ -220,7 +218,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                     }
                     loopNow = loopstart;
 
-                    need_i1 = true;
                     visit(ctx.cond());
 
                     blockTreeNode save_curnode = curBlock;
@@ -997,7 +994,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+tmp1+", "+tmp2, true);            
                 }
                 nodenumber ="%"+counter;
-                need_i1 = false;
                 break;
             }
         }
@@ -1014,12 +1010,12 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.saveBuf("%"+ ++counter +" = icmp ne i32 "+nodenumber+", 0", true);
                     nodenumber ="%"+counter;
                     zext_i1 = false;
-                    need_i1 = false;
                 }
-                if(need_i1){
+                else{
                     curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+nodenumber+", 0", true);
-                    nodenumber = "%"+counter;
+                    nodenumber ="%"+counter;
                 }
+
                 break;
             }
             case 3:{
@@ -1043,7 +1039,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.saveBuf("%"+ ++counter +" = icmp sge i32 "+tmp1+", "+tmp2 , true);
                 }
                 nodenumber ="%"+counter;
-                need_i1 = false;
                 break;
             }
         }
