@@ -1012,8 +1012,10 @@ class Visitor extends lab1BaseVisitor<Void>{
                     zext_i1 = false;
                 }
                 else{
-                    curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+nodenumber+", 0", true);
-                    nodenumber ="%"+counter;
+                    if(ctx.getParent().children.size()== 1){
+                        curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+nodenumber+", 0", true);
+                        nodenumber ="%"+counter;
+                    }
                 }
 
                 break;
