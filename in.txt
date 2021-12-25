@@ -1,0 +1,9 @@
+void set1(int arr[]) {
+    arr[0]=1;
+}
+
+int main() {
+    int arr[6];
+    set1(arr);
+    return 0;
+}
