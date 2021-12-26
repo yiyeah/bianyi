@@ -896,8 +896,16 @@ class Visitor extends lab1BaseVisitor<Void>{
             if(tmp.type.equals("array")){
                 // arr
                 if(!tmp.array.isParam){
-                    nodenumber=nodenumber.substring(1);
-                    nodenumber="%"+(Integer.parseInt(nodenumber)+1);
+                    if(nodenumber.charAt(0)=='%'){
+                        nodenumber=nodenumber.substring(1);
+                        nodenumber="%"+(Integer.parseInt(nodenumber)+1);
+                    }
+                    else if(nodenumber.charAt(0)=='@'){
+                        int len = tmp.array.len;
+                        curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ nodenumber+", i32 0, i32 0", true);
+                        nodenumber ="%"+counter;
+                    }
+                    
                     node_type = 1;
                 }
                 if(inparams){
