@@ -849,7 +849,6 @@ class Visitor extends lab1BaseVisitor<Void>{
             Boolean flag=false;
             String[] visit_arr_index;
             
-
             if(dim!=tmp.array.dim){
                 if(inparams&&dim==tmp.array.dim-1){
                     flag = true;
@@ -904,6 +903,10 @@ class Visitor extends lab1BaseVisitor<Void>{
             node_type = 1;
             if(tmp.type.equals("array")){
                 // arr
+                if(tmp.array.dim!=1){
+                    System.out.println("array dim error");
+                    System.exit(1); 
+                }
                 if(!tmp.array.isParam){
                     if(nodenumber.charAt(0)=='%'){
                         nodenumber=nodenumber.substring(1);
@@ -1031,7 +1034,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                 visit(ctx.primaryExp());
                 break;
             }
-            case 2:{              
+            case 2:{
+                //unaryOp unaryExp              
                 visit(ctx.unaryExp());
                 if(ctx.unaryOp().Sub()!=null){
                     int v =calc_value;
