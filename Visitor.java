@@ -464,10 +464,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             
             varTableItem tableItem;
-            if(!global)
-                tableItem = new varTableItem(ConstName, "0", "array", "%"+ ++counter+"");
-            else
-                tableItem = new varTableItem(ConstName, "0", "array", "@"+ConstName);
+            
             arrayStruct arr =new arrayStruct();
             int i=0,len=1;
             int dim = ctx.constExp().size();
@@ -478,6 +475,12 @@ class Visitor extends lab1BaseVisitor<Void>{
                 len*=calc_value;
                 i++;
             }
+
+            if(!global)
+                tableItem = new varTableItem(ConstName, "0", "array", "%"+ ++counter+"");
+            else
+                tableItem = new varTableItem(ConstName, "0", "array", "@"+ConstName);
+
             arr.dim = dim;
             arr.len = len;
             arr.data = new String[len];
