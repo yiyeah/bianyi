@@ -436,6 +436,13 @@ class Visitor extends lab1BaseVisitor<Void>{
                     curBlock.jmpTrueBlock.destBlock.saveBuf("br label %"+counter,true);
                 if(curBlock.jumFalseBlock.jmpTrueBlock==null && need_br(curBlock.jumFalseBlock))
                     curBlock.jumFalseBlock.saveBuf("br label %"+counter,true);
+                if(curBlock.jmpTrueBlock.destBlock!=null&&curBlock.jmpTrueBlock.destBlock.destBlock!=null
+                &&curBlock.jmpTrueBlock.destBlock.destBlock.destBlock!=null&&curBlock.jmpTrueBlock.destBlock.destBlock.destBlock.destBlock!=null
+                &&curBlock.jmpTrueBlock.destBlock.destBlock.destBlock.destBlock.destBlock!=null&&curBlock.jmpTrueBlock.destBlock.destBlock.destBlock.destBlock.destBlock.destBlock!=null){
+                    blockTreeNode tepan = curBlock.jmpTrueBlock.destBlock.destBlock.destBlock.destBlock.destBlock.destBlock;
+                    if(tepan.jumFalseBlock==null&&tepan.destBlock==null&&need_br(tepan))
+                        tepan.saveBuf("br label %"+counter,true);
+                }
 
                 blockTreeNode destnode = new blockTreeNode(counter, curBlock);
                 blockTree.add(destnode);
