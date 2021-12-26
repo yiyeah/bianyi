@@ -297,6 +297,10 @@ class Visitor extends lab1BaseVisitor<Void>{
                 }
 
                 visit(ctx.exp());
+                if(nodenumber.equals("%void")){
+                    System.out.println("void assign error");
+                    System.exit(1);
+                }
                 curBlock.saveBuf("store i32 "+nodenumber+", i32* "+lval_addr, true);
                 break;
             } 
@@ -675,8 +679,9 @@ class Visitor extends lab1BaseVisitor<Void>{
                 InArray = false;
                 return null;
             }
-            else
+            else{
                 visit(ctx.initVal()); 
+            }
             InArray = false;
             deep = 0;
             index = 0;
@@ -728,10 +733,18 @@ class Visitor extends lab1BaseVisitor<Void>{
     public Void visitInitVal(lab1Parser.InitValContext ctx) {
         if(ctx.exp()!=null){
             if(!InArray){
-               visit(ctx.exp()); 
+               visit(ctx.exp());
+               if(nodenumber.equals("%void")){
+                    System.out.println("void assign error");
+                    System.exit(1);
+                } 
             }
             else{
                 visit(ctx.exp());
+                if(nodenumber.equals("%void")){
+                    System.out.println("void assign error");
+                    System.exit(1);
+                }
                 int offset = getOffset(arr_dim_data, visit_arr_index);
                 int len = tmpArr.array.len;
                 if(global){
@@ -1311,6 +1324,7 @@ class Visitor extends lab1BaseVisitor<Void>{
         }
         else{
             if(!isInt){
+                //void
                 curBlock.saveBuf("call void @"+func.funcName+"(", false);
                 for(int i=0;i<param_cnt;i++){
                     curBlock.saveBuf(" i32", false);
@@ -1321,6 +1335,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                         curBlock.saveBuf(", ", false);
                 }
                 curBlock.saveBuf(")", true);
+                nodenumber = "%void";
             }
 
             else{
