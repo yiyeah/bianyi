@@ -157,6 +157,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 every_dim[0]=100;
                 int i=0;
                 for(lab1Parser.ExpContext tmpExp: ctx.exp()){
+                    visit(tmpExp);
                     every_dim[i+1]=calc_value;
                     i++;
                 }
@@ -779,7 +780,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                             System.out.print(",i32 0");
                         }
                         else{
-                            System.out.print("i332 0"); 
+                            System.out.print("i32 0"); 
                         }
                         index++;
                     }
