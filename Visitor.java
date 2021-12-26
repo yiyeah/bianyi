@@ -632,21 +632,26 @@ class Visitor extends lab1BaseVisitor<Void>{
                 System.out.println("var defined repeatedly error");
                 System.exit(1);
             }
+
             varTableItem tableItem;
-            if(!global)
-                tableItem = new varTableItem(varName, "0", "array", "%"+ ++counter+"");
-            else
-                tableItem = new varTableItem(varName, "0", "array", "@"+ varName+"");
+            
             arrayStruct arr =new arrayStruct();
             int i=0,len=1;
             int dim = ctx.constExp().size();
             arr.every_dim = new int[dim];
+
             for(lab1Parser.ConstExpContext dimDef:ctx.constExp()){
                 visit(dimDef);
                 arr.every_dim[i] = calc_value;
                 len*=calc_value;
                 i++;
             }
+
+            if(!global)
+                tableItem = new varTableItem(varName, "0", "array", "%"+ ++counter+"");
+            else
+                tableItem = new varTableItem(varName, "0", "array", "@"+ varName+"");
+
             arr.dim = dim;
             arr.len = len;
             arr.data = new String[len];
@@ -672,6 +677,7 @@ class Visitor extends lab1BaseVisitor<Void>{
 
             arr_dim_data = arr.every_dim;
             visit_arr_index =new int[dim];
+
             InArray = true;
             if(ctx.initVal()==null){
                 if(global)
@@ -945,7 +951,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 }
                 if(ctx.Plus()!=null){
                     if(!global)
-                        curBlock.saveBuf("%" + (++counter) + " = add i32 " + tmp1 +", "+ tmp2, true);
+                        curBlock.saveBuf("%" + (++counter) + " = add i32 " + tmp1 +", "+ tmp2, true);              
                     nodenumber ="%"+counter;
                     node_type = 0;
                     calc_value = v1+v2;
