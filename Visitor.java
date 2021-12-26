@@ -38,6 +38,8 @@ class Visitor extends lab1BaseVisitor<Void>{
     static int defType;
     static String[] params;
     static int[] everyParamsType;
+    static boolean inparams = false;
+    static boolean arr_as_param =false;
     Visitor(){
         init();
        System.out.println("declare i32 @getint()");
@@ -98,7 +100,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             visit(ctx.funcFParams());
         }
         System.out.print(")");
-
+        
         visit(ctx.block());
         if(funcName.equals("main")){
             blockTreeNode.globalvarTable = globalvarTable;
@@ -122,7 +124,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 System.out.print("i32");
             else
                 System.out.print(",i32");
-            for(int j=0;j<defType;j++)
+            if(defType!=0)
                 System.out.print("*");
             System.out.print(" %"+ counter+" ");
             counter++;
@@ -149,7 +151,16 @@ class Visitor extends lab1BaseVisitor<Void>{
                 varTableItem tableItem = new varTableItem(varName, null, "var", "%"+counter);
                 defType = ctx.exp().size()+1;
                 arrayStruct arr =new arrayStruct();
-                arr.dim = defType;
+                arr.isParam = true;
+                arr.dim = defType;           
+                int[] every_dim = new int[defType];
+                every_dim[0]=100;
+                int i=0;
+                for(lab1Parser.ExpContext tmpExp: ctx.exp()){
+                    every_dim[i+1]=calc_value;
+                    i++;
+                }
+                arr.every_dim = every_dim;
                 tableItem.array = arr;
                 curBlock.varTable.add(tableItem);
                 break;
@@ -170,8 +181,8 @@ class Visitor extends lab1BaseVisitor<Void>{
     @Override
     public Void visitBlock(lab1Parser.BlockContext ctx) {
         if(ctx.getParent().children.size()== 5 || ctx.getParent().children.size()== 6){
-            //funcDef  : funcType Ident '(' funcFParams?')' block
-            curBlock.saveBuf("{ \n",false);
+            //funcDef  : funcType Ident '(' funcFParams?')' block  
+            curBlock.saveBuf("{ \n",false);     
             for(varTableItem changeTmp: changetable){
                 curBlock.saveBuf("%"+ (++counter) +"= alloca i32", true);
                 String changeNum = changeTmp.address;
@@ -572,12 +583,14 @@ class Visitor extends lab1BaseVisitor<Void>{
                     i++;
                 }
                 int zeronum = getZeroNum(i, arr_dim_data, deep-1);
-                for(i=0;i<zeronum;i++){
-                    if(index!=0)
-                        System.out.print(",i32 0");
-                    else{
-                        System.out.print("i32 0");
-                        index++;
+                if(global){
+                    for(i=0;i<zeronum;i++){
+                        if(index!=0)
+                            System.out.print(",i32 0");
+                        else{
+                            System.out.print("i32 0");
+                            index++;
+                        }
                     }
                 }
                 if(global&&deep==1){
@@ -760,14 +773,16 @@ class Visitor extends lab1BaseVisitor<Void>{
                     i++;
                 } 
                 int zeronum = getZeroNum(i, arr_dim_data, deep-1);
-                for(i=0;i<zeronum;i++){
-                    if(index!=0){
-                        System.out.print(",i32 0");
+                if(global){
+                    for(i=0;i<zeronum;i++){
+                        if(index!=0){
+                            System.out.print(",i32 0");
+                        }
+                        else{
+                            System.out.print("i332 0"); 
+                        }
+                        index++;
                     }
-                    else{
-                        System.out.print("i32 0"); 
-                    }
-                    index++;
                 }
                 if(global&&deep==1){
                     System.out.println(" ]");
@@ -801,15 +816,27 @@ class Visitor extends lab1BaseVisitor<Void>{
 
         if(ctx.children.size()>1){
             //a[][][] array
+
             int dim = ctx.exp().size();
             int[]  arr_dim_data;
+            Boolean flag=false;
             String[] visit_arr_index;
-            visit_arr_index = new String[dim];
+            
 
             if(dim!=tmp.array.dim){
-                System.out.println("array dim error");
-                System.exit(1);
+                if(inparams&&dim==tmp.array.dim-1){
+                    flag = true;
+                }
+                else{
+                    System.out.println("array dim error");
+                    System.exit(1); 
+                }       
             }
+            if(flag)
+                visit_arr_index = new String[dim+1];
+            else
+                visit_arr_index = new String[dim];
+
             arr_dim_data = tmp.array.every_dim;
             int len = tmp.array.len;
 
@@ -819,18 +846,27 @@ class Visitor extends lab1BaseVisitor<Void>{
                 visit_arr_index[i] = nodenumber;//bug
                 i++;
             }
+            if(flag){
+                visit_arr_index[i]="0";
+                if(inparams){
+                    arr_as_param = true;
+                }
+            }
             String offset = getVarOffset(arr_dim_data, visit_arr_index);
             
-            curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ tmp.address+", i32 0, i32 "+ offset, true);
+            if(!tmp.array.isParam)
+                curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ tmp.address+", i32 0, i32 "+ offset, true);
+            else
+                curBlock.saveBuf("%"+ ++counter +"= getelementptr i32, i32* "+ tmp.address+", i32 "+ offset, true);
             nodenumber = "%"+counter;
             node_type = 1;
 
-            if(offset.charAt(0)!='%'){
+            if(!tmp.array.isParam && offset.charAt(0)!='%'){
                 int off = Integer.parseInt(offset);
                 if(tmp.array.data[off].charAt(0)!='%')
                     calc_value =Integer.parseInt(tmp.array.data[off]);
             }
-               
+ 
         }
         else{    
             if(global&&!tmp.type.equals("const")){
@@ -839,6 +875,18 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             nodenumber = tmp.address;
             node_type = 1;
+            if(tmp.type.equals("array")){
+                // arr
+                if(!tmp.array.isParam){
+                    nodenumber=nodenumber.substring(1);
+                    nodenumber="%"+(Integer.parseInt(nodenumber)+1);
+                    node_type = 1;
+                }
+                if(inparams){
+                    arr_as_param = true;
+                }
+
+            }
             if(tmp.value!=null&&tmp.value.charAt(0)!='%'){
                 calc_value =Integer.parseInt(tmp.value);           
             }
@@ -1015,11 +1063,11 @@ class Visitor extends lab1BaseVisitor<Void>{
             case 1:{
                 if(ctx.lVal()!=null){
                     visit(ctx.lVal());
-                    if(!global&&(nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@')){//是变量而非常量
+                    if(!global&&(!(inparams&&arr_as_param))&&(nodenumber.charAt(0)=='%'||nodenumber.charAt(0)=='@')){//是变量而非常量
                         curBlock.saveBuf("%"+ ++counter+"= load i32, i32* "+nodenumber, true);
                         nodenumber = "%"+counter;
                         node_type = 0;
-                    }
+                    }//根据paramtype!!!
                 }
                 else if(ctx.number()!=null)
                     visit(ctx.number());
@@ -1030,6 +1078,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 break;
             }
         }
+        arr_as_param = false;
         return null;
     }
 
@@ -1043,13 +1092,14 @@ class Visitor extends lab1BaseVisitor<Void>{
             System.out.println("param num error");
             System.exit(1);
         }
-
+        inparams = true;
         for(lab1Parser.ExpContext tmpExp: ctx.exp()){
             visit(tmpExp);
             lparams[i]= nodenumber;
             leveryParamsType[i]= node_type;
             i++;
         }
+        inparams = false;
         params = lparams;
         everyParamsType = leveryParamsType;
         
@@ -1259,7 +1309,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 curBlock.saveBuf("call void @"+func.funcName+"(", false);
                 for(int i=0;i<param_cnt;i++){
                     curBlock.saveBuf(" i32", false);
-                    for(int j=0;j<everyParamsType[j];j++)
+                    if(everyParamsType[i]!=0)
                         curBlock.saveBuf("*", false);
                     curBlock.saveBuf(" "+params[i], false);
                     if(i!=param_cnt-1)
@@ -1272,7 +1322,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 curBlock.saveBuf("%"+ ++counter+" = call i32 @"+func.funcName+"(", false);
                 for(int i=0;i<param_cnt;i++){
                     curBlock.saveBuf(" i32", false);
-                    for(int j=0;j<everyParamsType[j];j++)
+                    if(everyParamsType[i]!=0)
                         curBlock.saveBuf("*", false);
                     curBlock.saveBuf(" "+params[i], false);
                     if(i!=param_cnt-1)
@@ -1472,6 +1522,7 @@ class arrayStruct{
     String[] data;
     int dim;
     int len;
+    boolean isParam = false;
 }
 
 class function{
