@@ -149,7 +149,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             }
             default:{
                 //bType Ident ('[' ']' ( '[' exp ']' )* )?
-                varTableItem tableItem = new varTableItem(varName, null, "var", "%"+counter);
+                varTableItem tableItem = new varTableItem(varName, null, "array", "%"+counter);
                 defType = ctx.exp().size()+1;
                 arrayStruct arr =new arrayStruct();
                 arr.isParam = true;
@@ -904,6 +904,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             node_type = 1;
             if(tmp.type.equals("array")){
                 // arr
+                curBlock.saveBuf("wwww", true);
                 if(tmp.array.dim!=tmpFunc.paramType[paramdim]){
                     System.out.println("array dim error");
                     System.exit(1); 
