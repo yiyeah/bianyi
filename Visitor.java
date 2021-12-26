@@ -904,7 +904,6 @@ class Visitor extends lab1BaseVisitor<Void>{
             node_type = 1;
             if(tmp.type.equals("array")){
                 // arr
-                curBlock.saveBuf("wwww", true);
                 if(tmp.array.dim!=tmpFunc.paramType[paramdim]){
                     System.out.println("array dim error");
                     System.exit(1); 
