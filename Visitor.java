@@ -41,6 +41,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static boolean inparams = false;
     static boolean arr_as_param =false;
     static int paramdim;
+    static String retType;
     Visitor(){
         init();
        System.out.println("declare i32 @getint()");
@@ -77,7 +78,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     public Void visitFuncDef(lab1Parser.FuncDefContext ctx) {
             
         String funcName = ctx.Ident().getText();
-        String retType = ctx.funcType().Void()==null? "int" : "void" ;
+        retType = ctx.funcType().Void()==null? "int" : "void" ;
         Boolean hasParam = ctx.funcFParams() == null? false : true;
         if(!funcName.equals("main")){
             function fuc = new function(funcName, retType, hasParam);
@@ -196,8 +197,13 @@ class Visitor extends lab1BaseVisitor<Void>{
             for(lab1Parser.BlockItemContext blockitem: ctx.blockItem()){
                 visit(blockitem);
             }   
-            if(need_ret(curBlock))
-                curBlock.saveBuf("ret void", true);
+            if(need_ret(curBlock)){
+                if(retType.equals("void"))
+                    curBlock.saveBuf("ret void", true);
+                else
+                    curBlock.saveBuf("ret i32 0", true);
+            }
+                
             curBlock.saveBuf("}",true);
         }
         else if(ctx.getParent().getParent().children.size() == 5 || ctx.getParent().getParent().children.size() == 7){
