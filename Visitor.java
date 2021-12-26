@@ -40,6 +40,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static int[] everyParamsType;
     static boolean inparams = false;
     static boolean arr_as_param =false;
+    static int paramdim;
     Visitor(){
         init();
        System.out.println("declare i32 @getint()");
@@ -903,7 +904,7 @@ class Visitor extends lab1BaseVisitor<Void>{
             node_type = 1;
             if(tmp.type.equals("array")){
                 // arr
-                if(tmp.array.dim!=1){
+                if(tmp.array.dim!=tmpFunc.paramType[paramdim]){
                     System.out.println("array dim error");
                     System.exit(1); 
                 }
@@ -1133,6 +1134,7 @@ class Visitor extends lab1BaseVisitor<Void>{
         }
         inparams = true;
         for(lab1Parser.ExpContext tmpExp: ctx.exp()){
+            paramdim = i;
             visit(tmpExp);
             lparams[i]= nodenumber;
             leveryParamsType[i]= node_type;
