@@ -804,8 +804,12 @@ class Visitor extends lab1BaseVisitor<Void>{
     public Void visitLVal(lab1Parser.LValContext ctx) {
         String Lval = ctx.Ident().getText();
         varTableItem tmp;
-        if(!global)
+        if(!global){
             tmp = curBlock.findTableByName(Lval);
+            if(tmp==null){
+                tmp = findGlobalByName(Lval);
+            }
+        }
         else{
             tmp = findGlobalByName(Lval);
         }
