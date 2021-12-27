@@ -11,6 +11,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     static int counter = 0;
     static int calc_value = 0;
     static boolean calc_value_flag = false;
+    static boolean calc_flag = false;
     static List <function> funcTable = new ArrayList<>();
     static List <varTableItem> globalvarTable = new ArrayList<>();
 
@@ -75,8 +76,7 @@ class Visitor extends lab1BaseVisitor<Void>{
     }
 
     @Override
-    public Void visitFuncDef(lab1Parser.FuncDefContext ctx) {
-            
+    public Void visitFuncDef(lab1Parser.FuncDefContext ctx) {          
         String funcName = ctx.Ident().getText();
         retType = ctx.funcType().Void()==null? "int" : "void" ;
         Boolean hasParam = ctx.funcFParams() == null? false : true;
@@ -663,7 +663,6 @@ class Visitor extends lab1BaseVisitor<Void>{
                 len*=calc_value;
                 i++;
             }
-
             if(!global)
                 tableItem = new varTableItem(varName, "0", "array", "%"+ ++counter+"");
             else
@@ -857,7 +856,6 @@ class Visitor extends lab1BaseVisitor<Void>{
 
         if(ctx.children.size()>1){
             //a[][][] array
-
             int dim = ctx.exp().size();
             int[]  arr_dim_data;
             Boolean flag=false;
@@ -905,6 +903,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                 int off = Integer.parseInt(offset);
                 if(tmp.array.data[off].charAt(0)!='%')
                     calc_value =Integer.parseInt(tmp.array.data[off]);
+                    calc_flag = calc_value != 0? true : false;
             }
  
         }
@@ -930,21 +929,19 @@ class Visitor extends lab1BaseVisitor<Void>{
                         int len = tmp.array.len;
                         curBlock.saveBuf("%"+ ++counter +"= getelementptr ["+len+ " x i32], ["+ len +" x i32]* "+ nodenumber+", i32 0, i32 0", true);
                         nodenumber ="%"+counter;
-                    }
-                    
+                    }                
                     node_type = 1;
                 }
                 if(inparams){
                     arr_as_param = true;
                 }
-
             }
             if(tmp.value!=null&&tmp.value.charAt(0)!='%'){
-                calc_value =Integer.parseInt(tmp.value);           
+                calc_value =Integer.parseInt(tmp.value);
+                calc_flag = calc_value != 0? true : false;           
             }
             
-        }
-              
+        }          
         return null;
     }
 
@@ -975,6 +972,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     nodenumber ="%"+counter;
                     node_type = 0;
                     calc_value = v1+v2;
+                    calc_flag = calc_value != 0? true : false;
                 }
                 else if(ctx.Sub()!=null){
                     if(!global)
@@ -982,6 +980,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     nodenumber ="%"+counter;
                     node_type = 0;
                     calc_value = v1-v2;
+                    calc_flag = calc_value != 0? true : false;
                 }
                 break;
             }
@@ -1017,22 +1016,27 @@ class Visitor extends lab1BaseVisitor<Void>{
                     nodenumber ="%"+counter;
                     calc_value = v1*v2;
                     node_type = 0;
+                    calc_flag = calc_value != 0? true : false;
                 }
                 else if(ctx.Div()!=null){
                     if(!global)
                         curBlock.saveBuf("%" + (++counter) + " = sdiv i32 " + tmp1 +", "+ tmp2, true);
                     nodenumber ="%"+counter;
-                    if(v2!=0)
+                    if(v2!=0){
                         calc_value = v1/v2;
-                    node_type = 0;
+                        node_type = 0;
+                        calc_flag = calc_value != 0? true : false;
+                    }
                 }
                 else if(ctx.Mod()!=null){
                     if(!global)
                         curBlock.saveBuf("%" + (++counter) + " = srem i32 " + tmp1 +", "+ tmp2, true);
                     nodenumber ="%"+counter;
-                    if(v2!=0)
+                    if(v2!=0){
                         calc_value =v1%v2;
-                    node_type = 0;
+                        node_type = 0;
+                        calc_flag = calc_value != 0? true : false;
+                    }
                 }
                 
             }
@@ -1058,6 +1062,7 @@ class Visitor extends lab1BaseVisitor<Void>{
                     nodenumber = "%"+counter;
                     calc_value = 0-v;
                     node_type = 0;
+                    calc_flag = calc_value != 0? true : false;
                 }
                 else if(ctx.unaryOp().Not()!=null){
                     curBlock.saveBuf("%"+(++counter)+" = icmp eq i32 "+nodenumber +", 0", true);
@@ -1066,6 +1071,8 @@ class Visitor extends lab1BaseVisitor<Void>{
                     nodenumber = "%"+counter;
                     node_type = 0;
                     zext_i1 =true;
+                    calc_value = calc_value == 0 ? 1: 0;
+                    calc_flag = calc_value != 0? true : false;
                 }
 
                 visit(ctx.unaryOp());             
@@ -1166,6 +1173,7 @@ class Visitor extends lab1BaseVisitor<Void>{
         nodenumber = getNumber(ctx);
         calc_value = Integer.parseInt(getNumber(ctx));
         node_type = 0;
+        calc_flag = calc_value != 0? true : false;
         return null;
     }
 
@@ -1187,13 +1195,25 @@ class Visitor extends lab1BaseVisitor<Void>{
                 // lOrExp '||' lAndExp
                 visit(ctx.lOrExp());
                 String tmp1 = nodenumber;
+                Boolean flag1 = calc_flag;
 
-                visit(ctx.lAndExp());
-                String tmp2 = nodenumber;
+                if(calc_flag){
+                    curBlock.saveBuf("%"+ ++counter+" = or i1 " +tmp1+", 1", true);
+                    nodenumber ="%"+counter;
+                    node_type = -1;
+                }
+                else{
+                    visit(ctx.lAndExp());
+                    String tmp2 = nodenumber;
+                    Boolean flag2 = calc_flag;
 
-                curBlock.saveBuf("%"+ ++counter+" = or i1 " +tmp1+", "+tmp2, true);
-                nodenumber ="%"+counter;
-                node_type = -1;
+                    calc_flag =flag1||flag2;
+
+                    curBlock.saveBuf("%"+ ++counter+" = or i1 " +tmp1+", "+tmp2, true);
+                    nodenumber ="%"+counter;
+                    node_type = -1; 
+                }
+                
                 break;
             }
         }
@@ -1212,9 +1232,14 @@ class Visitor extends lab1BaseVisitor<Void>{
                 // lAndExp & & eqExp
                 visit(ctx.lAndExp());
                 String tmp1 = nodenumber;
+                Boolean flag1 = calc_flag;
 
                 visit(ctx.eqExp());
                 String tmp2 = nodenumber;
+                Boolean flag2= calc_flag;
+
+                calc_flag = flag1&&flag2;
+
                 curBlock.saveBuf("%"+ ++counter+" = and i1 " +tmp1+", "+tmp2, true);
                 nodenumber ="%"+counter;
                 node_type = -1;
@@ -1236,15 +1261,21 @@ class Visitor extends lab1BaseVisitor<Void>{
                 // eqExp ('==' | '!=') relExp;
                 visit(ctx.eqExp());
                 String tmp1 = nodenumber;
+                int calc1 = calc_value;
 
                 visit(ctx.relExp());
                 String tmp2 = nodenumber;
+                int calc2 = calc_value;
+
+                
 
                 if(ctx.NEqual() != null){
                     curBlock.saveBuf("%"+ ++counter +" = icmp ne i32 "+tmp1+", "+tmp2, true);
+                    calc_flag = (calc1 != calc2)? true : false;
                 }
                 else if(ctx.Equal() != null){
-                    curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+tmp1+", "+tmp2, true);            
+                    curBlock.saveBuf("%"+ ++counter +" = icmp eq i32 "+tmp1+", "+tmp2, true);
+                    calc_flag = (calc1 == calc2)? true : false;         
                 }
                 nodenumber ="%"+counter;
                 node_type = -1;
@@ -1280,21 +1311,27 @@ class Visitor extends lab1BaseVisitor<Void>{
                 // relExp ('<' | '>' | '<=' | '>=') addExp
                 visit(ctx.relExp());
                 String tmp1 = nodenumber;
+                int calc1 = calc_value;
 
                 visit(ctx.addExp());
                 String tmp2 = nodenumber;
+                int calc2 = calc_value;
 
                 if(ctx.Lt()!=null){
                     curBlock.saveBuf("%"+ ++counter +" = icmp slt i32 "+tmp1+", "+tmp2, true);
+                    calc_flag = calc1 < calc2? true : false;
                 }
                 else if(ctx.Le()!=null){
                     curBlock.saveBuf("%"+ ++counter +" = icmp sle i32 "+tmp1+", "+tmp2, true);
+                    calc_flag = calc1 <= calc2? true : false;
                 }
                 else if(ctx.Gt()!=null){
                     curBlock.saveBuf("%"+ ++counter +" = icmp sgt i32 "+tmp1+", "+tmp2, true);
+                    calc_flag = calc1 > calc2? true : false;
                 }
                 else if(ctx.Ge()!=null){
                     curBlock.saveBuf("%"+ ++counter +" = icmp sge i32 "+tmp1+", "+tmp2 , true);
+                    calc_flag = calc1 >= calc2? true : false;
                 }
                 nodenumber ="%"+counter;
                 node_type = -1;
